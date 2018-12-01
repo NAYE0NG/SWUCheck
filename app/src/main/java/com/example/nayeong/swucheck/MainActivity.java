@@ -21,18 +21,18 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
-   static final String HOST = "westus.api.cognitive.microsoft.com";
-   static final String CON_TYPE = "application/json";
-   static final String API_KEY ="";
+    static final String HOST = "westus.api.cognitive.microsoft.com";
+    static final String CON_TYPE = "application/json";
+    static final String API_KEY ="58d7f66f03ae4e818c5bb1fcd3ee04b7";
+
+    //azure private user profile
+    String userProfile;
 
     ProgressDialog progress;
 
     EditText swuId, swuPwd;
     Button loginBtn;
     String loginId, loginPwd;
-
-    //azure private user profile
-    String userProfile;
 
     SharedPreferences setting;
     SharedPreferences.Editor editor;
@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         if(loginId !=null && loginPwd != null && userProfile !=null) {
             Toast.makeText(MainActivity.this, loginId +"님 자동로그인 입니다.", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(MainActivity.this, Enrollment.class);
+            intent.putExtra("userProfile", userProfile);
             startActivity(intent);
             finish();
 

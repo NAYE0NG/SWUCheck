@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SWUcheck</string>
+    <string name="notice1">음성등록을 시작합니다.\n\n아래의 영어 문장 중 마음에 드는 문장 한가지를 선택하여 녹음 후, 음성등록을 진행해주세요.</string>
+    <string name="notice2">목소리 등록은 총 3번 진행합니다.\n남은 횟수를 확인하면서 등록을 진행하세요.</string>
 </resources>
