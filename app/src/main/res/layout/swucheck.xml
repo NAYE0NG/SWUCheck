@@ -1,11 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <TextView
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20px">
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="ffffffff"/>
-
+        android:layout_height="0px"
+        android:layout_weight="1"
+        android:text="ffffffff"
+        android:scaleType="fitEnd"
+        android:src="@drawable/mic" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="20px">
+        <Button
+            android:id="@+id/recordBtn"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/gray"
+            android:padding="20px"
+            android:layout_marginRight="8px"
+            android:text="녹음"/>
+        <Button
+            android:id="@+id/recordStopBtn"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:background="@color/gray"
+            android:layout_weight="1"
+            android:padding="20px"
+            android:layout_marginLeft="8px"
+            android:text="정지"/>
+    </LinearLayout>
+    <Button
+        android:id="@+id/enrollBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:textColor="@color/white"
+        android:text="출석체크"
+        android:layout_marginBottom="20px"/>
 
 </LinearLayout>

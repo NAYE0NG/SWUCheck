@@ -32,14 +32,18 @@
             android:layout_width="0px"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:padding="35px"
+            android:background="@color/gray"
+            android:padding="20px"
+            android:layout_marginRight="8px"
             android:text="녹음"/>
         <Button
             android:id="@+id/recordStopBtn"
             android:layout_width="0px"
             android:layout_height="wrap_content"
+            android:background="@color/gray"
             android:layout_weight="1"
-            android:padding="35px"
+            android:padding="20px"
+            android:layout_marginLeft="8px"
             android:text="정지"/>
     </LinearLayout>
     <LinearLayout
