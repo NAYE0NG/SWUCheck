@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -12,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,16 +43,13 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Enrollment extends Activity {
+public class Enrollment extends AppCompatActivity {
     static final String HOST = "westus.api.cognitive.microsoft.com";
-    static final String API_KEY ="58d7f66f03ae4e818c5bb1fcd3ee04b7";
+    static final String API_KEY ="";
 
     static final String RECORDED_FILE = "/sdcard/recorde.wav";
     WavRecorder wavRecorder = new WavRecorder("/sdcard/recorde.wav");
     File wavfile;
-
-    //azure private user profile
-    String userProfile;
 
     //phrase 저장
     ArrayList<HashMap<String,String>> arrayPhrase;
@@ -60,6 +59,16 @@ public class Enrollment extends Activity {
     String enrollMessage;
     int remainingEnrollments = -1;
 
+    //azure private user profile and this app user id
+    String userProfile, loginId;
+
+    //auto login and check enrolling status
+    SharedPreferences setting;
+    SharedPreferences.Editor editor;
+
+    String enrollStatus = null;
+
+
     ProgressDialog progress;
     phraseAdapter phrasesAdapter;
     ListView phraseList;
@@ -67,18 +76,42 @@ public class Enrollment extends Activity {
     TextView enrollNum;
     int count;
 
-    String ch;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.enrollment);
 
-        Intent intent = getIntent();
-        userProfile = intent.getStringExtra("userProfile");
+        Intent getIntent = getIntent();
+        userProfile = getIntent.getStringExtra("userProfile");
+        loginId =getIntent.getStringExtra("swuId");
+
+        //enroll status
+        setting = getSharedPreferences("setting", 0);
+
+        /*********여기 주석으로 넘기는 거임***********/
+        //enrollStatus = setting.getString("enrollStatus",null);
+        enrollStatus="nn";
+
+        //자동로그인이면 페이지 이동
+        if(loginId !=null && userProfile !=null && enrollStatus!= null) {
+            Toast.makeText(Enrollment.this, loginId +"님은 이미 등록된 음성이 존재합니다.", Toast.LENGTH_SHORT).show();
+
+            Intent intent = new Intent(this, SWUCheck.class);
+            intent.putExtra("userProfile", userProfile);
+            intent.putExtra("loginId", loginId);
+            intent.putExtra("enrollStatus",enrollStatus);
+            startActivity(intent);
+            finish();
+
+        }
+
+
+
+
 
         phraseList = (ListView) findViewById(R.id.phraseList);
         //phrase api 호출, 리스트 뷰 출력
-        new downPhrase().execute(null,null);
+        //********************new downPhrase().execute(null,null);
 
         //권한 체크
         checkPermission();
@@ -92,7 +125,7 @@ public class Enrollment extends Activity {
             @Override
             public void onClick(View v) {
                 wavRecorder.startRecording();
-                Toast.makeText(getApplicationContext(), ch, 2000).show();
+                Toast.makeText(getApplicationContext(), "녹음시작", 2000).show();
 
             }
         });
@@ -100,7 +133,7 @@ public class Enrollment extends Activity {
             @Override
             public void onClick(View v) {
                 wavRecorder.stopRecording();
-                Toast.makeText(getApplicationContext(), ch, 2000).show();
+                Toast.makeText(getApplicationContext(), "녹음정지", 2000).show();
             }
         });
 
@@ -399,7 +432,7 @@ public class Enrollment extends Activity {
                 totalAudioLen = in.getChannel().size();
                 totalDataLen = totalAudioLen + 36;
 
-                ch = "오디오 전체 시간 : "+String.valueOf(totalAudioLen);
+                //ch = "오디오 전체 시간 : "+String.valueOf(totalAudioLen);
 
                 WriteWaveFileHeader(out, totalAudioLen, totalDataLen,
                         longSampleRate, channels, byteRate);

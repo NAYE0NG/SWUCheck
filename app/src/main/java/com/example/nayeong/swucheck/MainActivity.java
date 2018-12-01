@@ -31,7 +31,7 @@ import java.net.URL;
 public class MainActivity extends AppCompatActivity {
     static final String HOST = "westus.api.cognitive.microsoft.com";
     static final String CON_TYPE = "application/json";
-    static final String API_KEY ="58d7f66f03ae4e818c5bb1fcd3ee04b7";
+    static final String API_KEY ="";
 
     //azure private user profile
     String userProfile = null;
@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, loginId +"님 자동로그인 입니다.", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(MainActivity.this, Enrollment.class);
             intent.putExtra("userProfile", userProfile);
+            intent.putExtra("swuId", loginId);
             startActivity(intent);
             finish();
 
@@ -123,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, swuId.getText().toString()+"님의 음성등록페이지로 이동합니다.", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, Enrollment.class);
                 intent.putExtra("userProfile", userProfile);
+                intent.putExtra("swuId", loginId);
                 startActivity(intent);
                 finish();
             }else{
