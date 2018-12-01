@@ -1,18 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:orientation="vertical"
+    android:padding="20px">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_marginTop="20px"
+        android:layout_weight="3"
+        android:paddingLeft="150px"
+        android:paddingRight="150px"
+        android:src="@drawable/swulogo" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="2"
+        android:orientation="vertical"
+        android:padding="20px">
+        <EditText
+            android:id="@+id/swuId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="25px"
+            android:layout_marginBottom="10px"
+            android:background="@color/gray"
+            android:hint="학번을 입력하세요"
+            android:inputType="number"/>
 
-</android.support.constraint.ConstraintLayout>
+        <EditText
+            android:id="@+id/swuPwd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="25px"
+            android:layout_marginBottom="30px"
+            android:background="@color/gray"
+            android:hint="비밀번호를 입력하세요"
+            android:inputType="text"/>
+        <Button
+            android:id="@+id/loginBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:textColor="@color/white"
+            android:text="로그인" />
+
+    </LinearLayout>
+</LinearLayout>
