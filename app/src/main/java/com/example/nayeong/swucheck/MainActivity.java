@@ -1,9 +1,17 @@
 package com.example.nayeong.swucheck;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.IntentCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     static final String API_KEY ="58d7f66f03ae4e818c5bb1fcd3ee04b7";
 
     //azure private user profile
-    String userProfile;
+    String userProfile = null;
 
     ProgressDialog progress;
 
@@ -54,6 +62,10 @@ public class MainActivity extends AppCompatActivity {
         loginId = setting.getString("swuId",null);
         loginPwd = setting.getString("swuPwd",null);
         userProfile= setting.getString("userProfile",null);
+
+
+        //자동로그인 전부터 외부저장소 권한 동적 확인
+        checkPermission();
 
 
 
@@ -92,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPreExecute() {
             progress = new ProgressDialog(MainActivity.this);
             progress.show();
-            progress.setMessage("등록문을 검색중입니다.");
+            progress.setMessage("사용자 확인 중 입니다.");
             super.onPreExecute();
         }
 
@@ -108,8 +120,9 @@ public class MainActivity extends AppCompatActivity {
                 editor.putString("userProfile", userProfile);
                 editor.commit();
 
-                Toast.makeText(MainActivity.this, swuId.getText().toString() + "님 등록페이지로 이동합니다.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, swuId.getText().toString()+"님의 음성등록페이지로 이동합니다.", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, Enrollment.class);
+                intent.putExtra("userProfile", userProfile);
                 startActivity(intent);
                 finish();
             }else{
@@ -175,5 +188,31 @@ public class MainActivity extends AppCompatActivity {
         }catch (Exception e) { }
 
     }
+
+    /*킷켓 이상부터 외부저장소 퍼미션 동적 추가
+     * http://kylblog.tistory.com/12
+     * */
+    private void checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) { // 마시멜로우 버전과 같거나 이상이라면
+            if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                    || checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                    || checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                /*
+                if(shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    Toast.makeText(this, "외부 저장소 사용을 위해 읽기/쓰기 필요", Toast.LENGTH_SHORT).show();
+                }*/
+
+                requestPermissions(new String[]
+                                {Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.RECORD_AUDIO},
+                        3);//마지막 인자는 체크해야될 권한 갯수
+
+                //Toast.makeText(MainActivity.this, "[ 권한설정 완료 ]앱을 완전히 종료 후 다시 시작하십시오.", Toast.LENGTH_SHORT).show();
+
+                finish();
+
+            }
+        }
+    }
+
 
 }
