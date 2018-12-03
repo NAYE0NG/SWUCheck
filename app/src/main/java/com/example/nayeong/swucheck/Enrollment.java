@@ -45,7 +45,7 @@ import java.util.HashMap;
 
 public class Enrollment extends AppCompatActivity {
     static final String HOST = "westus.api.cognitive.microsoft.com";
-    static final String API_KEY ="";
+    static final String API_KEY ="236f82fc1810454c8c95e75a5c33d641";
 
     static final String RECORDED_FILE = "/sdcard/recorde.wav";
     WavRecorder wavRecorder = new WavRecorder("/sdcard/recorde.wav");
@@ -65,8 +65,8 @@ public class Enrollment extends AppCompatActivity {
     //auto login and check enrolling status
     SharedPreferences setting;
     SharedPreferences.Editor editor;
-
-    String enrollStatus = null;
+    int EnrollmentStatus = -1;
+    //String enrollStatus = null;
 
 
     ProgressDialog progress;
@@ -87,31 +87,36 @@ public class Enrollment extends AppCompatActivity {
 
         //enroll status
         setting = getSharedPreferences("setting", 0);
+        EnrollmentStatus = setting.getInt("remainingEnrollments",-1);
 
         /*********여기 주석으로 넘기는 거임***********/
         //enrollStatus = setting.getString("enrollStatus",null);
-        enrollStatus="nn";
+        //enrollStatus="nn";
+        Toast.makeText(Enrollment.this, userProfile+" | "+loginId+" | "+EnrollmentStatus, Toast.LENGTH_SHORT).show();
 
-        //자동로그인이면 페이지 이동
-        if(loginId !=null && userProfile !=null && enrollStatus!= null) {
+
+        //음성등록 완료시 페이지 이동
+        if(loginId !=null && userProfile !=null && EnrollmentStatus == 0) {
             Toast.makeText(Enrollment.this, loginId +"님은 이미 등록된 음성이 존재합니다.", Toast.LENGTH_SHORT).show();
 
-            Intent intent = new Intent(this, SWUCheck.class);
+            Intent intent = new Intent(Enrollment.this, SWUCheck.class);
             intent.putExtra("userProfile", userProfile);
             intent.putExtra("loginId", loginId);
-            intent.putExtra("enrollStatus",enrollStatus);
             startActivity(intent);
-            finish();
-
+            //finish();
         }
 
 
-
+        //textview설정
+        if(EnrollmentStatus != -1){ //남은 횟수 표시
+            enrollNum = (TextView) findViewById(R.id.count);
+            enrollNum.setText(String.valueOf(EnrollmentStatus));
+        }
 
 
         phraseList = (ListView) findViewById(R.id.phraseList);
         //phrase api 호출, 리스트 뷰 출력
-        //********************new downPhrase().execute(null,null);
+        new downPhrase().execute(null,null);
 
         //권한 체크
         checkPermission();
@@ -528,13 +533,27 @@ public class Enrollment extends AppCompatActivity {
             Log.i("log",result);
             parserEnroll(result);
 
-            Toast.makeText(getApplicationContext(), "[에러 발생]\n"+enrollMessage,2000).show();
+            Toast.makeText(getApplicationContext(), "[결과]\n"+enrollMessage,2000).show();
+
 
             if(remainingEnrollments==0){
-                //페이지 이동
-                Toast.makeText(getApplicationContext(), "페이지를 이동합니다.",2000).show();
-            }else if(remainingEnrollments==-1){
 
+                editor = setting.edit();
+                editor.putString("loginId", loginId);
+                editor.putString("userProfile", userProfile);
+                editor.putInt("remainingEnrollments",remainingEnrollments);
+                editor.commit();
+
+
+                Toast.makeText(getApplicationContext(), "페이지를 이동합니다.",2000).show();
+                //페이지 이동
+                Intent intent = new Intent(Enrollment.this, SWUCheck.class);
+                intent.putExtra("userProfile", userProfile);
+                intent.putExtra("loginId", loginId);
+                startActivity(intent);
+                finish();
+
+            }else if(remainingEnrollments==-1){
             }else{
                 //남은 횟수 변경
                 enrollNum = (TextView) findViewById(R.id.count);
@@ -638,6 +657,12 @@ public class Enrollment extends AppCompatActivity {
                 remainingEnrollments = new JSONObject(result).getInt("remainingEnrollments");
                 String phrase = new JSONObject(result).getString("phrase");
                 enrollMessage = String.valueOf(enrollmentsCount)+"회 등록 성공\n남은 횟수: "+String.valueOf(remainingEnrollments)+"\n인식된 문구: "+phrase;
+
+                //여기에서 remainingEnrollments를 등록
+                editor = setting.edit();
+                editor.putInt("remainingEnrollments",remainingEnrollments);
+                editor.commit();
+
 
             }catch (Exception e){}
         }//인자가 잘 못 된 경우

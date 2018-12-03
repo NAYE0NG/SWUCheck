@@ -31,7 +31,7 @@ import java.net.URL;
 public class MainActivity extends AppCompatActivity {
     static final String HOST = "westus.api.cognitive.microsoft.com";
     static final String CON_TYPE = "application/json";
-    static final String API_KEY ="";
+    static final String API_KEY ="236f82fc1810454c8c95e75a5c33d641";
 
     //azure private user profile
     String userProfile = null;
@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             }else{
-                Toast.makeText(MainActivity.this, "[로그인 실패]\n인터넷 사용 권한이 필요합니다. \n[설정 -> 앱 권한]에서 설정이 가능합니다.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "[로그인 실패]\n인터넷을 연결하세요.", Toast.LENGTH_SHORT).show();
 
             }
 

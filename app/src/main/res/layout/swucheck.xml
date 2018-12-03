@@ -4,6 +4,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="20px">
+    <TextView
+        android:id="@+id/userInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20px"
+        android:gravity="center_vertical"/>
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="0px"
