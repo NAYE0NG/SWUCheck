@@ -34,7 +34,7 @@ import java.net.URLConnection;
 
 public class SWUCheck extends AppCompatActivity {
     static final String HOST = "westus.api.cognitive.microsoft.com";
-    static final String API_KEY ="236f82fc1810454c8c95e75a5c33d641";
+    static final String API_KEY ="";
 
     static final String RECORDED_FILE = "/sdcard/recorde.wav";
     WavRecorder wavRecorder = new WavRecorder("/sdcard/recorde.wav");
@@ -437,7 +437,7 @@ public class SWUCheck extends AppCompatActivity {
 
                 if(objVerification.equals("Accept")) {
                     //혜준이 블루투스 함수 호출
-                    verificationResult = "[출석체크 완료]\n본인 목소리거 확인되었습니다.";
+                    verificationResult = "[출석체크 성공]\n본인 목소리가 확인되었습니다.";
 
                 }else if(objVerification.equals("Reject")){
                     verificationResult = "[출석체크 실패]\n본인이 아닙니다.";

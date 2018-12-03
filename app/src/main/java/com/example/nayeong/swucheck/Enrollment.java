@@ -45,7 +45,7 @@ import java.util.HashMap;
 
 public class Enrollment extends AppCompatActivity {
     static final String HOST = "westus.api.cognitive.microsoft.com";
-    static final String API_KEY ="236f82fc1810454c8c95e75a5c33d641";
+    static final String API_KEY ="";
 
     static final String RECORDED_FILE = "/sdcard/recorde.wav";
     WavRecorder wavRecorder = new WavRecorder("/sdcard/recorde.wav");

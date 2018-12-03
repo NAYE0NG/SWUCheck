@@ -31,7 +31,7 @@ import java.net.URL;
 public class MainActivity extends AppCompatActivity {
     static final String HOST = "westus.api.cognitive.microsoft.com";
     static final String CON_TYPE = "application/json";
-    static final String API_KEY ="236f82fc1810454c8c95e75a5c33d641";
+    static final String API_KEY ="";
 
     //azure private user profile
     String userProfile = null;
