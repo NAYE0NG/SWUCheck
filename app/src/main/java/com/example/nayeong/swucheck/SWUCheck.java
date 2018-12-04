@@ -1,13 +1,22 @@
 package com.example.nayeong.swucheck;
 
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -33,6 +42,8 @@ import java.net.URLConnection;
 
 
 public class SWUCheck extends AppCompatActivity {
+    private BluetoothAdapter mBluetoothAdapter;
+    private BroadcastReceiver advertisingFailureReceiver;
     static final String HOST = "westus.api.cognitive.microsoft.com";
     static final String API_KEY ="";
 
@@ -51,10 +62,14 @@ public class SWUCheck extends AppCompatActivity {
     TextView userInfo;
     Button recordBtn, recordStopBtn, enrollBtn;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.swucheck);
+        mBluetoothAdapter = ((BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE))
+                .getAdapter();
+
 
         Intent getIntent = getIntent();
         userProfile = getIntent.getStringExtra("userProfile");
@@ -436,7 +451,9 @@ public class SWUCheck extends AppCompatActivity {
                 String objVerification =  new JSONObject(result).getString("result").toString();
 
                 if(objVerification.equals("Accept")) {
+
                     //혜준이 블루투스 함수 호출
+                    startAdvertising();
                     verificationResult = "[출석체크 성공]\n본인 목소리가 확인되었습니다.";
 
                 }else if(objVerification.equals("Reject")){
@@ -452,6 +469,30 @@ public class SWUCheck extends AppCompatActivity {
             verificationResult = "[출석체크 실패]\n인터넷 연결 및 녹음파일을 확인하세요.";
         }
 
+    }
+    private void startAdvertising() {
+        Context c = this;
+        c.startService(getServiceIntent(c));
+    }
+    private void stopAdvertising() {
+        Context c = this;
+        c.stopService(getServiceIntent(c));
+    }
+    /**
+     * When app goes off screen, unregister the Advertising failure Receiver to stop memory leaks.
+     * (and because the app doesn't care if Advertising fails while the UI isn't active)
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        this.unregisterReceiver(advertisingFailureReceiver);
+    }
+
+    /**
+     * Returns Intent addressed to the {@code AdvertiserService} class.
+     */
+    private static Intent getServiceIntent(Context c) {
+        return new Intent(c, AdvertiserService.class);
     }
 
 

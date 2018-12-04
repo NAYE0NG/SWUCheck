@@ -3,6 +3,8 @@ package com.example.nayeong.swucheck;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.IntentCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -45,52 +48,53 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences setting;
     SharedPreferences.Editor editor;
 
-
+    private BluetoothAdapter mBluetoothAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
         swuId = (EditText) findViewById(R.id.swuId);
         swuPwd = (EditText) findViewById(R.id.swuPwd);
         loginBtn = (Button) findViewById(R.id.loginBtn);
 
-        //auto login
-        setting = getSharedPreferences("setting", 0);
 
-        loginId = setting.getString("swuId",null);
-        loginPwd = setting.getString("swuPwd",null);
-        userProfile= setting.getString("userProfile",null);
+        if (savedInstanceState == null) {
 
+            mBluetoothAdapter = ((BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE))
+                    .getAdapter();
 
-        //자동로그인 전부터 외부저장소 권한 동적 확인
-        checkPermission();
+            // Is Bluetooth supported on this device?
+            if (mBluetoothAdapter != null) {
 
+                // Is Bluetooth turned on?
+                if (mBluetoothAdapter.isEnabled()) {
 
+                    // Are Bluetooth Advertisements supported on this device?
+                    if (mBluetoothAdapter.isMultipleAdvertisementSupported()) {
+                        // Everything is supported and enabled
+                        setupLogin();
 
-        //자동로그인이면 페이지 이동
-        if(loginId !=null && loginPwd != null && userProfile !=null) {
-            Toast.makeText(MainActivity.this, loginId +"님 자동로그인 입니다.", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(MainActivity.this, Enrollment.class);
-            intent.putExtra("userProfile", userProfile);
-            intent.putExtra("swuId", loginId);
-            startActivity(intent);
-            finish();
+                    } else {
+                        Toast.makeText(MainActivity.this, R.string.bt_ads_not_supported, Toast.LENGTH_SHORT).show();
+                    }
+                } else {
 
-        }else if(loginId == null && loginPwd == null){
-            //로그인 기록 없으면 메인엑티비티 보여줌
-            loginBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    downProfile profileTask = new downProfile();
-                    profileTask.execute(null, null);
-
-                   }
-            });
+                    // Prompt user to turn on Bluetooth (logic continues in onActivityResult()).
+                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(enableBtIntent, Constants.REQUEST_ENABLE_BT);
+                }
+            } else {
+                // Bluetooth is not supported.
+                Toast.makeText(MainActivity.this,R.string.bt_not_supported, Toast.LENGTH_SHORT).show();
+            }
         }
+
     }
+
 
     /*인증 프로필 만들기*/
     class downProfile extends AsyncTask<String,String,String> {
@@ -129,7 +133,6 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }else{
                 Toast.makeText(MainActivity.this, "[로그인 실패]\n인터넷을 연결하세요.", Toast.LENGTH_SHORT).show();
-
             }
 
             progress.dismiss();
@@ -213,6 +216,72 @@ public class MainActivity extends AppCompatActivity {
                 finish();
 
             }
+        }
+    }
+
+    private void setupLogin() {
+//auto login
+        setting = getSharedPreferences("setting", 0);
+
+        loginId = setting.getString("swuId",null);
+        loginPwd = setting.getString("swuPwd",null);
+        userProfile= setting.getString("userProfile",null);
+
+
+        //자동로그인 전부터 외부저장소 권한 동적 확인
+        checkPermission();
+
+        //자동로그인이면 페이지 이동
+        if(loginId !=null && loginPwd != null && userProfile !=null) {
+            Toast.makeText(MainActivity.this, loginId +"님 자동로그인 입니다.", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(MainActivity.this, Enrollment.class);
+            intent.putExtra("userProfile", userProfile);
+            intent.putExtra("swuId", loginId);
+            startActivity(intent);
+            finish();
+
+        }else if(loginId == null && loginPwd == null){
+            //로그인 기록 없으면 메인엑티비티 보여줌
+            loginBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    downProfile profileTask = new downProfile();
+                    profileTask.execute(null, null);
+
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case Constants.REQUEST_ENABLE_BT:
+
+                if (resultCode == RESULT_OK) {
+
+                    // Bluetooth is now Enabled, are Bluetooth Advertisements supported on
+                    // this device?
+                    if (mBluetoothAdapter.isMultipleAdvertisementSupported()) {
+
+                        // Everything is supported and enabled, load the fragments.
+                        setupLogin();
+
+                    } else {
+                        Toast.makeText(MainActivity.this,R.string.bt_ads_not_supported, Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+
+                    // User declined to enable Bluetooth, exit the app.
+                    Toast.makeText(this, R.string.bt_not_enabled_leaving,
+                            Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+
+            default:
+                super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
